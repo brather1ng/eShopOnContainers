@@ -13,6 +13,9 @@ using System;
 using System.IO;
 using Azure.Identity;
 using Azure.Core;
+using Serilog.Sinks.Elasticsearch;
+using Serilog.Enrichers.Span;
+using Serilog.Formatting.Compact;
 
 string Namespace = typeof(Startup).Namespace;
 string AppName = Namespace.Substring(Namespace.LastIndexOf('.', Namespace.LastIndexOf('.') - 1) + 1);
@@ -77,9 +80,9 @@ Serilog.ILogger CreateSerilogLogger(IConfiguration configuration)
         .MinimumLevel.Verbose()
         .Enrich.WithProperty("ApplicationContext", AppName)
         .Enrich.FromLogContext()
-        .WriteTo.Console()
+        .Enrich.WithSpan()
+        .WriteTo.Console(new RenderedCompactJsonFormatter())
         .WriteTo.Seq(string.IsNullOrWhiteSpace(seqServerUrl) ? "http://seq" : seqServerUrl)
-        .WriteTo.Http(string.IsNullOrWhiteSpace(logstashUrl) ? "http://localhost:8080" : logstashUrl)
         .ReadFrom.Configuration(configuration)
         .CreateLogger();
 }

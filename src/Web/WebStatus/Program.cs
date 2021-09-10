@@ -10,6 +10,7 @@ using System.Reflection;
 using WebStatus;
 using Azure.Identity;
 using Azure.Core;
+using Serilog.Sinks.Elasticsearch;
 
 var configuration = GetConfiguration();
 
@@ -57,6 +58,11 @@ Serilog.ILogger CreateSerilogLogger(IConfiguration configuration)
         .WriteTo.Console()
         .WriteTo.Seq(string.IsNullOrWhiteSpace(seqServerUrl) ? "http://seq" : seqServerUrl)
         .WriteTo.Http(string.IsNullOrWhiteSpace(logstashUrl) ? "http://logstash:8080" : logstashUrl)
+        .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("http://localhost:9200"))
+        {
+            AutoRegisterTemplate = true,
+            AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv7
+        })
         .ReadFrom.Configuration(configuration)
         .CreateLogger();
 }

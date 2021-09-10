@@ -6,8 +6,11 @@
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
+    using OpenTelemetry.Resources;
+    using OpenTelemetry.Trace;
     using Ordering.BackgroundTasks.Extensions;
     using Ordering.BackgroundTasks.Services;
+    using System;
 
     public class Startup
     {
@@ -24,7 +27,14 @@
                 .Configure<BackgroundTaskSettings>(this.Configuration)
                 .AddOptions()
                 .AddHostedService<GracePeriodManagerService>()
-                .AddEventBus(this.Configuration);
+                .AddEventBus(this.Configuration)
+                .AddOpenTelemetryTracing(builder => builder
+                    .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(Program.AppName))
+                    .AddAspNetCoreInstrumentation()
+                    .AddGrpcClientInstrumentation()
+                    .AddHttpClientInstrumentation()
+                    .AddSqlClientInstrumentation()
+                    .AddOtlpExporter(options => options.Endpoint = new Uri("http://tempo:55680"))); ;
         }
 
 

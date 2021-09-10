@@ -26,6 +26,8 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using RabbitMQ.Client;
 using System;
 using System.Data.Common;
@@ -53,7 +55,14 @@ namespace Microsoft.eShopOnContainers.Services.Catalog.API
                 .AddIntegrationServices(Configuration)
                 .AddEventBus(Configuration)
                 .AddSwagger(Configuration)
-                .AddCustomHealthCheck(Configuration);
+                .AddCustomHealthCheck(Configuration)
+                .AddOpenTelemetryTracing(builder => builder
+                    .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(Program.AppName))
+                    .AddAspNetCoreInstrumentation()
+                    .AddGrpcClientInstrumentation()
+                    .AddHttpClientInstrumentation()
+                    .AddSqlClientInstrumentation()
+                    .AddOtlpExporter(options => options.Endpoint = new Uri("http://tempo:55680"))); ;
 
             var container = new ContainerBuilder();
             container.Populate(services);

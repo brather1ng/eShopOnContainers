@@ -5,6 +5,9 @@ using Serilog;
 using System;
 using System.IO;
 using Ordering.SignalrHub;
+using Serilog.Sinks.Elasticsearch;
+using Serilog.Enrichers.Span;
+using Serilog.Formatting.Compact;
 
 var configuration = GetConfiguration();
 
@@ -47,9 +50,9 @@ static Serilog.ILogger CreateSerilogLogger(IConfiguration configuration)
         .MinimumLevel.Verbose()
         .Enrich.WithProperty("ApplicationContext", Program.AppName)
         .Enrich.FromLogContext()
-        .WriteTo.Console()
+        .Enrich.WithSpan()
+        .WriteTo.Console(new RenderedCompactJsonFormatter())
         .WriteTo.Seq(string.IsNullOrWhiteSpace(seqServerUrl) ? "http://seq" : seqServerUrl)
-        .WriteTo.Http(string.IsNullOrWhiteSpace(logstashUrl) ? "http://logstash:8080" : logstashUrl)
         .ReadFrom.Configuration(configuration)
         .CreateLogger();
 }

@@ -1,0 +1,143 @@
+version: '3.5'
+
+services:
+
+  grafana:
+    image: grafana/grafana
+    volumes:
+      - grafana-data:/var/lib/grafana
+    ports:
+      - 3000:3000
+    environment:
+      GF_AUTH_DISABLE_LOGIN_FORM: true
+      GF_AUTH_ANONYMOUS_ENABLED: true
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+
+  tempo:
+    image: grafana/tempo
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ../deploy/grafana/tempo-local.yaml:/etc/tempo.yaml
+      - tempo-data:/tmp/tempo
+    ports:
+      - 55680:55680
+      - 3200:3200
+  
+  loki:
+    image: grafana/loki
+    command: [ "-config.file=/etc/loki/local-config.yaml" ]
+    volumes:
+      - loki-data:/tmp/loki
+    ports:
+      - 3100:3100
+
+  fluentd:
+    image: grafana/fluent-plugin-loki:master
+    command:
+      - "fluentd"
+      - "-v"
+      - "-p"
+      - "/fluentd/plugins"
+    environment:
+      LOKI_URL: http://loki:3100
+      FLUENTD_CONF: loki-p.conf
+    ports:
+      - 24224:24224
+    volumes:
+      - ../deploy/grafana/fluentd-loki.conf:/fluentd/etc/loki-p.conf
+
+  identity-api:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-sub-second-precision: "true"
+    depends_on:
+      - fluentd
+
+  basket-api:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-sub-second-precision: "true"
+    depends_on:
+      - fluentd
+
+  catalog-api:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-sub-second-precision: "true"
+    depends_on:
+      - fluentd
+
+  ordering-api:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-sub-second-precision: "true"
+    depends_on:
+      - fluentd
+
+  ordering-backgroundtasks:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-sub-second-precision: "true"
+    depends_on:
+      - fluentd
+
+  payment-api:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-sub-second-precision: "true"
+    depends_on:
+      - fluentd
+
+  webshoppingagg:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-sub-second-precision: "true"
+    depends_on:
+      - fluentd
+
+  ordering-signalrhub:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-sub-second-precision: "true"
+    depends_on:
+      - fluentd
+
+  webspa:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-sub-second-precision: "true"
+    depends_on:
+      - fluentd
+
+  webmvc:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-sub-second-precision: "true"
+    depends_on:
+      - fluentd
+
+volumes:
+  grafana-data:
+    external: true
+
+  elasticsearch-data:
+    external: true
+  
+  tempo-data:
+    external: true
+    
+  loki-data:
+    external: true
+  
+  fluentd-data:
+    external: true

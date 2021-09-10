@@ -1,12 +1,12 @@
-version: '3.4'
+version: '3.5'
 
 services:
 
   elasticsearch:
     build:
-      context: elk/elasticsearch/
+      context: ../deploy/elk/elasticsearch/
     volumes:
-      - ./elk/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - ../deploy/elk/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -15,10 +15,10 @@ services:
 
   logstash:
     build:
-      context: elk/logstash/
+      context: ../deploy/elk/logstash/
     volumes:
-      - ./elk/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
-      - ./elk/logstash/pipeline:/usr/share/logstash/pipeline:ro
+      - ../deploy/elk/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      - ../deploy/elk/logstash/pipeline:/usr/share/logstash/pipeline:ro
     ports:
       - "8080:8080"
     environment:
@@ -27,11 +27,11 @@ services:
       - elasticsearch
 
   kibana:
-    build:
-      context: elk/kibana/
-    volumes:
-      - ./elk/kibana/config/:/usr/share/kibana/config:ro
+    image: docker.elastic.co/kibana/kibana:7.14.0
     ports:
       - "5601:5601"
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      ELASTICSEARCH_HOSTS: '["http://elasticsearch:9200"]'
     depends_on:
       - elasticsearch

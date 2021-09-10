@@ -14,6 +14,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Logging;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using StackExchange.Redis;
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -39,7 +41,14 @@ namespace Microsoft.eShopOnContainers.WebMVC
                 .AddHealthChecks(Configuration)
                 .AddCustomMvc(Configuration)
                 .AddDevspaces()
-                .AddHttpClientServices(Configuration);
+                .AddHttpClientServices(Configuration)
+                .AddOpenTelemetryTracing(builder => builder
+                    .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(Program.AppName))
+                    .AddAspNetCoreInstrumentation()
+                    .AddGrpcClientInstrumentation()
+                    .AddHttpClientInstrumentation()
+                    .AddSqlClientInstrumentation()
+                    .AddOtlpExporter(options => options.Endpoint = new Uri("http://tempo:55680")));
 
             IdentityModelEventSource.ShowPII = true;       // Caution! Do NOT use in production: https://aka.ms/IdentityModel/PII
 

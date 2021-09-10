@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Ordering.BackgroundTasks.Extensions;
 using Serilog;
+using Serilog.Enrichers.Span;
+using Serilog.Formatting.Compact;
 using System.IO;
 
 namespace Ordering.BackgroundTasks
@@ -29,7 +31,13 @@ namespace Ordering.BackgroundTasks
                     builder.AddEnvironmentVariables();
                     builder.AddCommandLine(args);
                 })
-                .ConfigureLogging((host, builder) => builder.UseSerilog(host.Configuration).AddSerilog())
+                .UseSerilog((host, config) => config
+                    .MinimumLevel.Verbose()
+                    .Enrich.WithProperty("ApplicationContext", AppName)
+                    .Enrich.FromLogContext()
+                    .Enrich.WithSpan()
+                    .WriteTo.Console(new CompactJsonFormatter())
+                    .ReadFrom.Configuration(host.Configuration))
                 .Build();
     }
 }

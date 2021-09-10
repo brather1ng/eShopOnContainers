@@ -19,6 +19,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -49,7 +51,14 @@ namespace Microsoft.eShopOnContainers.Web.Shopping.HttpAggregator
                 .AddCustomAuthentication(Configuration)
                 .AddDevspaces()
                 .AddApplicationServices()
-                .AddGrpcServices();
+                .AddGrpcServices()
+                .AddOpenTelemetryTracing(builder => builder
+                    .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("Web.Shopping.HttpAggregator"))
+                    .AddAspNetCoreInstrumentation()
+                    .AddGrpcClientInstrumentation()
+                    .AddHttpClientInstrumentation()
+                    .AddSqlClientInstrumentation()
+                    .AddOtlpExporter(options => options.Endpoint = new Uri("http://tempo:55680")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

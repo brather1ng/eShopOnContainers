@@ -8,7 +8,7 @@
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <GeneratedItemPatterns>wwwroot/dist/**</GeneratedItemPatterns>
     <DefaultItemExcludes>$(DefaultItemExcludes);$(GeneratedItemPatterns)</DefaultItemExcludes>
-    <TypeScriptToolsVersion>4.2</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>4.3</TypeScriptToolsVersion>
     <LangVersion>preview</LangVersion>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..\..</DockerfileContext>
@@ -40,11 +40,24 @@
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="5.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.HealthChecks" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="5.0.7" />
-    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="5.0.7" />    
+    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="5.0.7" />
+	  <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.3.5">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+	  </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.8" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="OpenTelemetry" Version="1.1.0" />
+    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.1.0" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.0.0-rc7" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.0.0-rc7" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.GrpcNetClient" Version="1.0.0-rc7" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.0.0-rc7" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.SqlClient" Version="1.0.0-rc7" />
     <PackageReference Include="Serilog.AspNetCore" Version="4.1.0" />
+    <PackageReference Include="Serilog.Enrichers.Span" Version="1.3.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0-dev-00834" />
+    <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="8.4.1" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="5.0.1" />
   </ItemGroup>
   

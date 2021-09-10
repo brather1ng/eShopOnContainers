@@ -4,6 +4,9 @@ using Microsoft.eShopOnContainers.WebMVC;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Enrichers.Span;
+using Serilog.Formatting.Compact;
+using Serilog.Sinks.Elasticsearch;
 using System;
 using System.IO;
 
@@ -47,15 +50,9 @@ Serilog.ILogger CreateSerilogLogger(IConfiguration configuration)
         .ReadFrom.Configuration(configuration)
         .Enrich.WithProperty("ApplicationContext", Program.AppName)
         .Enrich.FromLogContext()
-        .WriteTo.Console();
-    if (!string.IsNullOrWhiteSpace(seqServerUrl))
-    {
-        cfg.WriteTo.Seq(seqServerUrl);
-    }
-    if (!string.IsNullOrWhiteSpace(logstashUrl))
-    {
-        cfg.WriteTo.Http(logstashUrl);
-    }
+        .Enrich.WithSpan()
+        .WriteTo.Console(new RenderedCompactJsonFormatter())
+        .WriteTo.Seq(string.IsNullOrWhiteSpace(seqServerUrl) ? "http://seq" : seqServerUrl);
     return cfg.CreateLogger();
 }
 

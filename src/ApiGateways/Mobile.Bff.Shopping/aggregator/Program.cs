@@ -2,7 +2,8 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.eShopOnContainers.Mobile.Shopping.HttpAggregator;
 using Serilog;
-
+using Serilog.Enrichers.Span;
+using Serilog.Formatting.Compact;
 
 BuildWebHost(args).Run();
 IWebHost BuildWebHost(string[] args) =>
@@ -23,7 +24,9 @@ IWebHost BuildWebHost(string[] args) =>
         {
             config
                 .MinimumLevel.Information()
+                .Enrich.WithProperty("ApplicationContext", "Mobile.Shopping.HttpAggregator")
                 .Enrich.FromLogContext()
-                .WriteTo.Console();
+                .Enrich.WithSpan()
+                .WriteTo.Console(new CompactJsonFormatter());
         })
         .Build();

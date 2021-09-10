@@ -12,6 +12,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Payment.API.IntegrationEvents.EventHandling;
 using Payment.API.IntegrationEvents.Events;
 using RabbitMQ.Client;
@@ -77,6 +79,15 @@ namespace Payment.API
                     return new DefaultRabbitMQPersistentConnection(factory, logger, retryCount);
                 });
             }
+
+            services
+                .AddOpenTelemetryTracing(builder => builder
+                    .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(Program.AppName))
+                    .AddAspNetCoreInstrumentation()
+                    .AddGrpcClientInstrumentation()
+                    .AddHttpClientInstrumentation()
+                    .AddSqlClientInstrumentation()
+                    .AddOtlpExporter(options => options.Endpoint = new Uri("http://tempo:55680")));
 
             RegisterEventBus(services);
 

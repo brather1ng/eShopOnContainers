@@ -13,6 +13,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using StackExchange.Redis;
 using System;
 using System.IO;
@@ -72,6 +74,15 @@ namespace eShopConContainers.WebSPA
             {
                 configuration.RootPath = "wwwroot";
             });
+
+            services
+                .AddOpenTelemetryTracing(builder => builder
+                    .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("WebSPA"))
+                    .AddAspNetCoreInstrumentation()
+                    .AddGrpcClientInstrumentation()
+                    .AddHttpClientInstrumentation()
+                    .AddSqlClientInstrumentation()
+                    .AddOtlpExporter(options => options.Endpoint = new Uri("http://tempo:55680")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

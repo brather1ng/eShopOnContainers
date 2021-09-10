@@ -18,6 +18,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using StackExchange.Redis;
 using System;
 using System.Reflection;
@@ -104,7 +106,14 @@ namespace Microsoft.eShopOnContainers.Services.Identity.API
                         sqlOptions.EnableRetryOnFailure(maxRetryCount: 15, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
                     });
             })
-            .Services.AddTransient<IProfileService, ProfileService>();
+            .Services.AddTransient<IProfileService, ProfileService>()
+                .AddOpenTelemetryTracing(builder => builder
+                    .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("Identity.API"))
+                    .AddAspNetCoreInstrumentation()
+                    .AddGrpcClientInstrumentation()
+                    .AddHttpClientInstrumentation()
+                    .AddSqlClientInstrumentation()
+                    .AddOtlpExporter(options => options.Endpoint = new Uri("http://tempo:55680")));
 
             //services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             services.AddControllers();

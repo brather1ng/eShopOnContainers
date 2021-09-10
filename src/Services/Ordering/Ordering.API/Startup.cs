@@ -29,6 +29,8 @@
     using Microsoft.Extensions.Diagnostics.HealthChecks;
     using Microsoft.Extensions.Logging;
     using Microsoft.OpenApi.Models;
+    using OpenTelemetry.Resources;
+    using OpenTelemetry.Trace;
     using Ordering.Infrastructure;
     using RabbitMQ.Client;
     using System;
@@ -63,7 +65,15 @@
                 .AddCustomIntegrations(Configuration)
                 .AddCustomConfiguration(Configuration)
                 .AddEventBus(Configuration)
-                .AddCustomAuthentication(Configuration);
+                .AddCustomAuthentication(Configuration)
+                .AddOpenTelemetryTracing(builder => builder
+                    .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(Program.AppName))
+                    .AddAspNetCoreInstrumentation()
+                    .AddGrpcClientInstrumentation()
+                    .AddHttpClientInstrumentation()
+                    .AddSqlClientInstrumentation()
+                    .AddOtlpExporter(options => options.Endpoint = new Uri("http://tempo:55680")));
+
             //configure autofac
 
             var container = new ContainerBuilder();

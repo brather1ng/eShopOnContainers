@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Enrichers.Span;
+using Serilog.Formatting.Compact;
 using System.IO;
 
 BuildWebHost(args).Run();
@@ -28,8 +30,9 @@ IWebHost BuildWebHost(string[] args) =>
             config
                 .MinimumLevel.Information()
                 .Enrich.FromLogContext()
+                .Enrich.WithSpan()
                 .WriteTo.Seq("http://seq")
-                .ReadFrom.Configuration(builderContext.Configuration)
-                .WriteTo.Console();
+                .WriteTo.Console(new RenderedCompactJsonFormatter())
+                .ReadFrom.Configuration(builderContext.Configuration);
         })
         .Build();
