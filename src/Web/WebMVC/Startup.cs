@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Logging;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using StackExchange.Redis;
@@ -51,7 +52,8 @@ namespace Microsoft.eShopOnContainers.WebMVC
                     .AddGrpcClientInstrumentation()
                     .AddHttpClientInstrumentation()
                     .AddSqlClientInstrumentation()
-                    .AddOtlpExporter(options => options.Endpoint = new Uri("http://tempo:55680")));
+                    .AddOtlpExporter(options => options.Endpoint = new Uri("http://tempo:55680")))
+                .AddOpenTelemetryMetrics(Program.AppName);
 
             IdentityModelEventSource.ShowPII = true;       // Caution! Do NOT use in production: https://aka.ms/IdentityModel/PII
 
@@ -79,6 +81,8 @@ namespace Microsoft.eShopOnContainers.WebMVC
             {
                 app.UsePathBase(pathBase);
             }
+
+            app.UseMetrics();
 
             app.UseStaticFiles();
             app.UseSession();

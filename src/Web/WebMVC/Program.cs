@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Enrichers.Span;
 using Serilog.Formatting.Compact;
-using Serilog.Sinks.Elasticsearch;
 using System;
 using System.IO;
 

@@ -46,6 +46,14 @@ services:
       - ../deploy/grafana/fluentd-loki.conf:/fluentd/etc/docker.conf
     depends_on:
       - loki
+  
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - prometheus-data:/prometheus
+      - ../deploy/grafana/prometheus.yaml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
 
   identity-api:
     environment:
@@ -160,15 +168,13 @@ services:
 volumes:
   grafana-data:
     external: true
-
   elasticsearch-data:
     external: true
-  
   tempo-data:
     external: true
-    
   loki-data:
     external: true
-  
   fluentd-data:
+    external: true
+  prometheus-data:
     external: true
