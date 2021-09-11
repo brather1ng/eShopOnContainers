@@ -22,6 +22,7 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using StackExchange.Redis;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace Microsoft.eShopOnContainers.Services.Identity.API
@@ -108,7 +109,9 @@ namespace Microsoft.eShopOnContainers.Services.Identity.API
             })
             .Services.AddTransient<IProfileService, ProfileService>()
                 .AddOpenTelemetryTracing(builder => builder
-                    .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("Identity.API"))
+                    .SetResourceBuilder(ResourceBuilder.CreateDefault()
+                        .AddService(Configuration["ServiceName"])
+                        .AddAttributes(new[] { new KeyValuePair<string, object>("service", Configuration["ServiceName"]), new KeyValuePair<string, object>("application", "Identity.API") }))
                     .AddAspNetCoreInstrumentation()
                     .AddGrpcClientInstrumentation()
                     .AddHttpClientInstrumentation()

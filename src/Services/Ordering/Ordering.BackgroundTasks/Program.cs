@@ -36,7 +36,7 @@ namespace Ordering.BackgroundTasks
                     .Enrich.WithProperty("ApplicationContext", AppName)
                     .Enrich.FromLogContext()
                     .Enrich.WithSpan()
-                    .WriteTo.Console(new CompactJsonFormatter())
+                    .WriteTo.Console(new RenderedCompactJsonFormatter())
                     .ReadFrom.Configuration(host.Configuration))
                 .Build();
     }

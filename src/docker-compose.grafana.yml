@@ -25,9 +25,8 @@ services:
   
   loki:
     image: grafana/loki
-    command: [ "-config.file=/etc/loki/local-config.yaml" ]
     volumes:
-      - loki-data:/tmp/loki
+      - loki-data:/loki
     ports:
       - 3100:3100
 
@@ -40,89 +39,121 @@ services:
       - "/fluentd/plugins"
     environment:
       LOKI_URL: http://loki:3100
-      FLUENTD_CONF: loki-p.conf
+      FLUENTD_CONF: docker.conf
     ports:
       - 24224:24224
     volumes:
-      - ../deploy/grafana/fluentd-loki.conf:/fluentd/etc/loki-p.conf
+      - ../deploy/grafana/fluentd-loki.conf:/fluentd/etc/docker.conf
+    depends_on:
+      - loki
 
   identity-api:
+    environment:
+      - ServiceName=identity-api
     logging:
       driver: fluentd
       options:
         fluentd-sub-second-precision: "true"
+        env: ServiceName
     depends_on:
       - fluentd
 
   basket-api:
+    environment:
+      - ServiceName=basket-api
     logging:
       driver: fluentd
       options:
         fluentd-sub-second-precision: "true"
+        env: ServiceName
     depends_on:
       - fluentd
 
   catalog-api:
+    environment:
+      - ServiceName=catalog-api
     logging:
       driver: fluentd
       options:
         fluentd-sub-second-precision: "true"
+        env: ServiceName
     depends_on:
       - fluentd
 
   ordering-api:
+    environment:
+      - ServiceName=ordering-api
     logging:
       driver: fluentd
       options:
         fluentd-sub-second-precision: "true"
+        env: ServiceName
     depends_on:
       - fluentd
 
   ordering-backgroundtasks:
+    environment:
+      - ServiceName=ordering-backgroundtasks
     logging:
       driver: fluentd
       options:
         fluentd-sub-second-precision: "true"
+        env: ServiceName
     depends_on:
       - fluentd
 
   payment-api:
+    environment:
+      - ServiceName=payment-api
     logging:
       driver: fluentd
       options:
         fluentd-sub-second-precision: "true"
+        env: ServiceName
     depends_on:
       - fluentd
 
   webshoppingagg:
+    environment:
+      - ServiceName=webshoppingagg
     logging:
       driver: fluentd
       options:
         fluentd-sub-second-precision: "true"
+        env: ServiceName
     depends_on:
       - fluentd
 
   ordering-signalrhub:
+    environment:
+      - ServiceName=ordering-signalrhub
     logging:
       driver: fluentd
       options:
         fluentd-sub-second-precision: "true"
+        env: ServiceName
     depends_on:
       - fluentd
 
   webspa:
+    environment:
+      - ServiceName=webspa
     logging:
       driver: fluentd
       options:
         fluentd-sub-second-precision: "true"
+        env: ServiceName
     depends_on:
       - fluentd
 
   webmvc:
+    environment:
+      - ServiceName=webmvc
     logging:
       driver: fluentd
       options:
         fluentd-sub-second-precision: "true"
+        env: ServiceName
     depends_on:
       - fluentd
 

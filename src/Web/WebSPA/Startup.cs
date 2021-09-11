@@ -17,6 +17,7 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using StackExchange.Redis;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using WebSPA.Infrastructure;
 
@@ -77,7 +78,9 @@ namespace eShopConContainers.WebSPA
 
             services
                 .AddOpenTelemetryTracing(builder => builder
-                    .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("WebSPA"))
+                    .SetResourceBuilder(ResourceBuilder.CreateDefault()
+                        .AddService(Configuration["ServiceName"])
+                        .AddAttributes(new[] { new KeyValuePair<string, object>("service", Configuration["ServiceName"]), new KeyValuePair<string, object>("application", "WebSPA") }))
                     .AddAspNetCoreInstrumentation()
                     .AddGrpcClientInstrumentation()
                     .AddHttpClientInstrumentation()

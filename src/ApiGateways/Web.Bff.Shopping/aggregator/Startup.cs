@@ -53,7 +53,9 @@ namespace Microsoft.eShopOnContainers.Web.Shopping.HttpAggregator
                 .AddApplicationServices()
                 .AddGrpcServices()
                 .AddOpenTelemetryTracing(builder => builder
-                    .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("Web.Shopping.HttpAggregator"))
+                    .SetResourceBuilder(ResourceBuilder.CreateDefault()
+                        .AddService(Configuration["ServiceName"])
+                        .AddAttributes(new[] { new KeyValuePair<string, object>("service", Configuration["ServiceName"]), new KeyValuePair<string, object>("application", "Web.Shopping.HttpAggregator") }))
                     .AddAspNetCoreInstrumentation()
                     .AddGrpcClientInstrumentation()
                     .AddHttpClientInstrumentation()

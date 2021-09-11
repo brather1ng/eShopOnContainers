@@ -18,6 +18,7 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using StackExchange.Redis;
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using WebMVC.Infrastructure;
 
@@ -43,7 +44,9 @@ namespace Microsoft.eShopOnContainers.WebMVC
                 .AddDevspaces()
                 .AddHttpClientServices(Configuration)
                 .AddOpenTelemetryTracing(builder => builder
-                    .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(Program.AppName))
+                    .SetResourceBuilder(ResourceBuilder.CreateDefault()
+                        .AddService(Configuration["ServiceName"])
+                        .AddAttributes(new[] { new KeyValuePair<string, object>("service", Configuration["ServiceName"]), new KeyValuePair<string, object>("application", Program.AppName) }))
                     .AddAspNetCoreInstrumentation()
                     .AddGrpcClientInstrumentation()
                     .AddHttpClientInstrumentation()

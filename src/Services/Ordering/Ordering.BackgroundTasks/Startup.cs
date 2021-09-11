@@ -11,6 +11,7 @@
     using Ordering.BackgroundTasks.Extensions;
     using Ordering.BackgroundTasks.Services;
     using System;
+    using System.Collections.Generic;
 
     public class Startup
     {
@@ -29,7 +30,9 @@
                 .AddHostedService<GracePeriodManagerService>()
                 .AddEventBus(this.Configuration)
                 .AddOpenTelemetryTracing(builder => builder
-                    .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(Program.AppName))
+                    .SetResourceBuilder(ResourceBuilder.CreateDefault()
+                        .AddService(Configuration["ServiceName"])
+                        .AddAttributes(new[] { new KeyValuePair<string, object>("service", Configuration["ServiceName"]), new KeyValuePair<string, object>("application", Program.AppName) }))
                     .AddAspNetCoreInstrumentation()
                     .AddGrpcClientInstrumentation()
                     .AddHttpClientInstrumentation()
