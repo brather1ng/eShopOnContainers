@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
-using OpenTelemetry;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -30,10 +29,6 @@ namespace Microsoft.eShopOnContainers.OpenTelemetry
             var stopwatch = Stopwatch.StartNew();
             EnsureInstrumentsCreated();
 
-            if (Activity.Current is Activity activity)
-            {
-                Baggage.SetBaggage("TraceId", activity.TraceId.ToHexString());
-            }
             var commonAttributes = new[]
             {
                 new KeyValuePair<string, object?>("http.method", httpContext.Request.Method),
@@ -63,8 +58,6 @@ namespace Microsoft.eShopOnContainers.OpenTelemetry
 
                 _totalRequests.Add(1, fullAttributes);
                 _duration.Record(stopwatch.ElapsedMilliseconds, fullAttributes);
-
-                Baggage.RemoveBaggage("TraceId");
             }
         }
 
