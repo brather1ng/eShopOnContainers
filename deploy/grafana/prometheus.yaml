@@ -6,6 +6,20 @@ scrape_configs:
   - job_name: "prometheus"
     static_configs:
       - targets: ["localhost:9090"]
-  - job_name: "webmvc"
-    static_configs:
-      - targets: ["webmvc"]
+
+  - job_name: "docker-containers"
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+    relabel_configs:
+      - source_labels: [__meta_docker_container_label_prometheus_enable]
+        regex: .+
+        action: keep
+      - regex: __meta_docker_container_label_prometheus_(.+)
+        action: labelmap
+        replacement: $1
+      - regex: __meta_docker_container_name
+        action: labelmap
+        replacement: container_name
+      - regex: __meta_docker_container_label_com_docker_compose_service
+        action: labelmap
+        replacement: service

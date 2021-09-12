@@ -52,8 +52,10 @@ services:
     volumes:
       - prometheus-data:/prometheus
       - ../deploy/grafana/prometheus.yaml:/etc/prometheus/prometheus.yml
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     ports:
       - 9090:9090
+    user: root
 
   identity-api:
     environment:
@@ -157,6 +159,8 @@ services:
   webmvc:
     environment:
       - ServiceName=webmvc
+    labels:
+      - "prometheus.enable=true"
     logging:
       driver: fluentd
       options:
