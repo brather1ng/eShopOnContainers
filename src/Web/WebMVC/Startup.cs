@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.eShopOnContainers.OpenTelemetry;
 using Microsoft.eShopOnContainers.WebMVC.Services;
 using Microsoft.eShopOnContainers.WebMVC.ViewModels;
 using Microsoft.Extensions.Configuration;
@@ -44,16 +45,8 @@ namespace Microsoft.eShopOnContainers.WebMVC
                 .AddCustomMvc(Configuration)
                 .AddDevspaces()
                 .AddHttpClientServices(Configuration)
-                .AddOpenTelemetryTracing(builder => builder
-                    .SetResourceBuilder(ResourceBuilder.CreateDefault()
-                        .AddService(Configuration["ServiceName"])
-                        .AddAttributes(new[] { new KeyValuePair<string, object>("service", Configuration["ServiceName"]), new KeyValuePair<string, object>("application", Program.AppName) }))
-                    .AddAspNetCoreInstrumentation()
-                    .AddGrpcClientInstrumentation()
-                    .AddHttpClientInstrumentation()
-                    .AddSqlClientInstrumentation()
-                    .AddOtlpExporter(options => options.Endpoint = new Uri("http://tempo:55680")))
-                .AddOpenTelemetryMetrics(Program.AppName);
+                .AddOpenTelemetryTracing(Configuration, Program.AppName)
+                .AddOpenTelemetryMetrics(Configuration, Program.AppName);
 
             IdentityModelEventSource.ShowPII = true;       // Caution! Do NOT use in production: https://aka.ms/IdentityModel/PII
 
@@ -82,7 +75,8 @@ namespace Microsoft.eShopOnContainers.WebMVC
                 app.UsePathBase(pathBase);
             }
 
-            app.UseMetrics();
+            app.UsePrometheusMetricsExporter();
+            app.UseMetricsMiddleware();
 
             app.UseStaticFiles();
             app.UseSession();

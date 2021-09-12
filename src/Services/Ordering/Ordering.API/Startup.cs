@@ -1,4 +1,7 @@
-﻿namespace Microsoft.eShopOnContainers.Services.Ordering.API
+﻿using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+
+namespace Microsoft.eShopOnContainers.Services.Ordering.API
 {
     using AspNetCore.Http;
     using Autofac;
@@ -29,8 +32,6 @@
     using Microsoft.Extensions.Diagnostics.HealthChecks;
     using Microsoft.Extensions.Logging;
     using Microsoft.OpenApi.Models;
-    using OpenTelemetry.Resources;
-    using OpenTelemetry.Trace;
     using Ordering.Infrastructure;
     using RabbitMQ.Client;
     using System;
